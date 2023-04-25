@@ -1,0 +1,3 @@
+project_id: ‘${{ secrets.PROJECT_ID }}’
+authorization: ‘${{ secrets.AUTH_TOKEN }}’
+path: '__tests__/path'
