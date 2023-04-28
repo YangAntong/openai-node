@@ -1,9 +1,15 @@
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
+  organization: process.env.ORG_ID,
   apiKey: process.env.OPENAI_API_KEY,
+
 });
+
+
 const openai = new OpenAIApi(configuration);
+
+
 
 export default async function (req, res) {
   if (!configuration.apiKey) {
@@ -25,12 +31,15 @@ export default async function (req, res) {
     return;
   }
 
+  let completion = { data: '' }
+
   try {
-    const completion = await openai.createCompletion({
-      model: "gpt-3.5-turbo",
-      message: [{role:"user",content:content}],
-      temperature: 0.7,
-    });
+    console.log(content);
+    completion = await openai
+        .createChatCompletion({
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: content }],
+        })
     res.status(200).json({ result: completion.data.choices[0].message.content });
   } catch(error) {
     // Consider adjusting the error handling logic for your use case
@@ -48,15 +57,3 @@ export default async function (req, res) {
   }
 }
 
-function generatePrompt(animal) {
-  const capitalizedAnimal =
-    animal[0].toUpperCase() + animal.slice(1).toLowerCase();
-  return `Suggest three names for an animal that is a superhero.
-
-Animal: Cat
-Names: Captain Sharpclaw, Agent Fluffball, The Incredible Feline
-Animal: Dog
-Names: Ruff the Protector, Wonder Canine, Sir Barks-a-Lot
-Animal: ${capitalizedAnimal}
-Names:`;
-}
